@@ -1,0 +1,15 @@
+{
+  "name": "@investment-platform/source",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {},
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "@nx/js": "24.0.4",
+    "@nx/workspace": "24.0.4",
+    "nx": "24.0.4",
+    "typescript": "~6.0.3"
+  },
+  "packageManager": "npm@10.9.3"
+}
