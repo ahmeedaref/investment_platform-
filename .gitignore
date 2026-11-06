@@ -43,3 +43,25 @@ Thumbs.db
 .nx/migrate-runs
 .claude/worktrees
 .claude/settings.local.json
+
+/generated/prisma
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# AI editor local configuration and downloaded skills
+.agents/
+.claude/
+.windsurf/
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Generated files
+dist/
+coverage/
+libs/database/generated/prisma/

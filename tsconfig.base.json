@@ -1,0 +1,45 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "bundler",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": [
+      "es2020",
+      "dom"
+    ],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "strict": false,
+    "paths": {
+      "@investment-platform/database": [
+        "./libs/database/src/index.ts"
+      ],
+      "@investment-platform/auth": [
+        "./libs/auth/src/index.ts"
+      ],
+      "@investment-platform/messaging": [
+        "./libs/messaging/src/index.ts"
+      ],
+      "@investment-platform/workflow": [
+        "./libs/workflow/src/index.ts"
+      ],
+      "@investment-platform/external-integration": [
+        "./libs/external-integration/src/index.ts"
+      ],
+      "@investment-platform/rules": [
+        "./libs/rules/src/index.ts"
+      ]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "contentType": "application/vnd.gorules.decision",
+  "nodes": [
+    {
+      "id": "input-1",
+      "type": "inputNode",
+      "position": {
+        "x": 70,
+        "y": 250
+      },
+      "name": "Request"
+    },
+    {
+      "id": "risk-1",
+      "type": "decisionTableNode",
+      "position": {
+        "x": 370,
+        "y": 250
+      },
+      "name": "Evaluate Investment Risk",
+      "content": {
+        "hitPolicy": "first",
+        "inputs": [
+          {
+            "id": "amount",
+            "field": "investmentAmount",
+            "name": "Investment Amount",
+            "fieldType": {
+              "type": "number"
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "id": "riskLevel",
+            "field": "riskLevel",
+            "name": "Risk Level",
+            "outputFieldType": {
+              "type": "string"
+            }
+          },
+          {
+            "id": "requiresApproval",
+            "field": "requiresApproval",
+            "name": "Requires Approval",
+            "outputFieldType": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "rules": [
+          {
+            "_id": "low",
+            "_description": "Low risk investment",
+            "amount": "< 100000",
+            "riskLevel": "\"LOW\"",
+            "requiresApproval": "false"
+          },
+          {
+            "_id": "medium",
+            "_description": "Medium risk investment",
+            "amount": "[100000..999999.99]",
+            "riskLevel": "\"MEDIUM\"",
+            "requiresApproval": "true"
+          },
+          {
+            "_id": "high",
+            "_description": "High risk investment",
+            "amount": ">= 1000000",
+            "riskLevel": "\"HIGH\"",
+            "requiresApproval": "true"
+          }
+        ]
+      }
+    },
+    {
+      "id": "output-1",
+      "type": "outputNode",
+      "position": {
+        "x": 670,
+        "y": 250
+      },
+      "name": "Response"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-1",
+      "type": "edge",
+      "sourceId": "input-1",
+      "targetId": "risk-1"
+    },
+    {
+      "id": "edge-2",
+      "type": "edge",
+      "sourceId": "risk-1",
+      "targetId": "output-1"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "name": "investment-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/investment-service/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "prune-lockfile": {
+      "dependsOn": [
+        "build"
+      ],
+      "cache": true,
+      "executor": "@nx/js:prune-lockfile",
+      "outputs": [
+        "{workspaceRoot}/dist/apps/investment-service/package.json",
+        "{workspaceRoot}/dist/apps/investment-service/package-lock.json"
+      ],
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "copy-workspace-modules": {
+      "dependsOn": [
+        "build"
+      ],
+      "cache": true,
+      "outputs": [
+        "{workspaceRoot}/dist/apps/investment-service/workspace_modules"
+      ],
+      "executor": "@nx/js:copy-workspace-modules",
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "prune": {
+      "dependsOn": [
+        "prune-lockfile",
+        "copy-workspace-modules"
+      ],
+      "executor": "nx:noop"
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": [
+        "build"
+      ],
+      "readyWhen": {
+        "signal": true
+      },
+      "options": {
+        "buildTarget": "investment-service:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "investment-service:build:development"
+        },
+        "production": {
+          "buildTarget": "investment-service:build:production"
+        }
+      }
+    },
+    "test": {
+      "options": {
+        "passWithNoTests": true
+      }
+    }
+  }
+}

@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+    xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:flowable="http://flowable.org/bpmn"
+    targetNamespace="http://investment-platform/workflow">
+
+  <process id="investmentApproval"
+           name="Investment Approval and Company Establishment"
+           isExecutable="true">
+
+    <!-- Process input variables:
+         investorId, companyName, investmentAmount, nationalId, companyId
+         approvalGroups, approvedCount=0, rejectedCount=0
+         approvalSlaDuration, escalationGroup
+         missingData, verificationRequestBody, taxRequestBody
+         riskRequestBody, registrationRequestBody, notificationRequestBody
+         nationalIdVerificationUrl, taxVerificationUrl, riskEvaluationUrl
+         companyRegistrationUrl, notificationUrl, escalationUrl
+    -->
+
+    <startEvent id="startInvestment" name="Investment Request Received"/>
+    <sequenceFlow id="f_start_validate" sourceRef="startInvestment" targetRef="validateRequest"/>
+
+    <!-- 1. Validate required information -->
+    <serviceTask id="validateRequest" name="Validate Investment Data"
+                 flowable:type="http" flowable:async="true">
+      <extensionElements>
+        <flowable:field name="requestMethod">
+          <flowable:string>POST</flowable:string>
+        </flowable:field>
+        <flowable:field name="requestUrl">
+          <flowable:expression><![CDATA[${validateRequestUrl}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="requestHeaders">
+          <flowable:string>Content-Type: application/json</flowable:string>
+        </flowable:field>
+        <flowable:field name="requestBody">
+          <flowable:expression><![CDATA[${validationRequestBody}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="responseVariableName">
+          <flowable:string>validationResponse</flowable:string>
+        </flowable:field>
+        <flowable:field name="saveResponseVariableAsJson">
+          <flowable:string>true</flowable:string>
+        </flowable:field>
+        <flowable:field name="failStatusCodes">
+          <flowable:string>4XX,5XX</flowable:string>
+        </flowable:field>
+        <flowable:failedJobRetryTimeCycle>R10/PT5S</flowable:failedJobRetryTimeCycle>
+      </extensionElements>
+    </serviceTask>
+
+    <exclusiveGateway id="missingDataGateway" name="Missing Data?"/>
+    <sequenceFlow id="f_validate_missing" sourceRef="validateRequest" targetRef="missingDataGateway"/>
+
+    <sequenceFlow id="f_missing_yes" sourceRef="missingDataGateway" targetRef="collectMissingData">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${validationResponse.missingData == true}]]></conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="f_missing_no" sourceRef="missingDataGateway" targetRef="verificationSplit">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${validationResponse.missingData == false}]]></conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="collectMissingData" name="Collect Missing Investment Data"
+              flowable:candidateGroups="internal-ops"/>
+    <sequenceFlow id="f_collect_revalidate" sourceRef="collectMissingData" targetRef="validateRequest"/>
+
+    <!-- 2. Parallel verification -->
+    <parallelGateway id="verificationSplit" name="Start Parallel Verification"/>
+    <sequenceFlow id="f_split_national" sourceRef="verificationSplit" targetRef="verifyNationalId"/>
+    <sequenceFlow id="f_split_tax" sourceRef="verificationSplit" targetRef="verifyTaxClearance"/>
+
+    <serviceTask id="verifyNationalId" name="Verify National ID"
+                 flowable:type="http" flowable:async="true">
+      <extensionElements>
+        <flowable:field name="requestMethod">
+          <flowable:string>POST</flowable:string>
+        </flowable:field>
+        <flowable:field name="requestUrl">
+          <flowable:expression><![CDATA[${nationalIdVerificationUrl}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="requestHeaders">
+          <flowable:string>Content-Type: application/json</flowable:string>
+        </flowable:field>
+        <flowable:field name="requestBody">
+          <flowable:expression><![CDATA[${verificationRequestBody}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="failStatusCodes">
+          <flowable:string>4XX,5XX</flowable:string>
+        </flowable:field>
+        <flowable:failedJobRetryTimeCycle>R10/PT5S</flowable:failedJobRetryTimeCycle>
+      </extensionElements>
+    </serviceTask>
+
+    <serviceTask id="verifyTaxClearance" name="Verify Tax Clearance"
+                 flowable:type="http" flowable:async="true">
+      <extensionElements>
+        <flowable:field name="requestMethod">
+          <flowable:string>POST</flowable:string>
+        </flowable:field>
+        <flowable:field name="requestUrl">
+          <flowable:expression><![CDATA[${taxVerificationUrl}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="requestHeaders">
+          <flowable:string>Content-Type: application/json</flowable:string>
+        </flowable:field>
+        <flowable:field name="requestBody">
+          <flowable:expression><![CDATA[${taxRequestBody}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="failStatusCodes">
+          <flowable:string>4XX,5XX</flowable:string>
+        </flowable:field>
+        <flowable:failedJobRetryTimeCycle>R10/PT5S</flowable:failedJobRetryTimeCycle>
+      </extensionElements>
+    </serviceTask>
+
+    <parallelGateway id="verificationJoin" name="Both Verifications Completed"/>
+    <sequenceFlow id="f_national_join" sourceRef="verifyNationalId" targetRef="verificationJoin"/>
+    <sequenceFlow id="f_tax_join" sourceRef="verifyTaxClearance" targetRef="verificationJoin"/>
+
+    <!-- 3. Risk evaluation -->
+    <serviceTask id="evaluateRisk" name="Evaluate Investment Risk"
+                 flowable:type="http" flowable:async="true">
+      <extensionElements>
+        <flowable:field name="requestMethod">
+          <flowable:string>POST</flowable:string>
+        </flowable:field>
+        <flowable:field name="requestUrl">
+          <flowable:expression><![CDATA[${riskEvaluationUrl}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="requestHeaders">
+          <flowable:string>Content-Type: application/json</flowable:string>
+        </flowable:field>
+        <flowable:field name="requestBody">
+          <flowable:expression><![CDATA[${riskRequestBody}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="responseVariableName">
+          <flowable:string>riskResponse</flowable:string>
+        </flowable:field>
+        <flowable:field name="saveResponseVariableAsJson">
+          <flowable:string>true</flowable:string>
+        </flowable:field>
+        <flowable:field name="failStatusCodes">
+          <flowable:string>4XX,5XX</flowable:string>
+        </flowable:field>
+        <flowable:failedJobRetryTimeCycle>R10/PT5S</flowable:failedJobRetryTimeCycle>
+      </extensionElements>
+    </serviceTask>
+
+    <sequenceFlow id="f_join_risk" sourceRef="verificationJoin" targetRef="evaluateRisk"/>
+    <exclusiveGateway id="riskGateway" name="Risk Level"/>
+    <sequenceFlow id="f_risk_gateway" sourceRef="evaluateRisk" targetRef="riskGateway"/>
+
+    <!-- LOW risk bypasses approval -->
+    <sequenceFlow id="f_low" sourceRef="riskGateway" targetRef="approvedRoute">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskResponse.riskLevel == 'LOW'}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- MEDIUM and HIGH require approval -->
+    <sequenceFlow id="f_medium" sourceRef="riskGateway" targetRef="parallelApprovals">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskResponse.riskLevel == 'MEDIUM'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="f_high" sourceRef="riskGateway" targetRef="parallelApprovals">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskResponse.riskLevel == 'HIGH'}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- 4. Five parallel group approvals -->
+    <userTask id="parallelApprovals" name="Approval by Five Groups"
+              flowable:candidateGroups="${approvalGroup}">
+
+      <multiInstanceLoopCharacteristics isSequential="false"
+          flowable:collection="${approvalGroups}"
+          flowable:elementVariable="approvalGroup">
+        <completionCondition xsi:type="tFormalExpression"><![CDATA[
+          ${approvedCount >= 3 || rejectedCount >= 3}
+        ]]></completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+
+    <!-- SLA timer: duration supplied as PT24H or PT48H -->
+    <boundaryEvent id="approvalSlaTimer" name="Approval SLA Breached"
+                   attachedToRef="parallelApprovals" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration xsi:type="tFormalExpression"><![CDATA[${approvalSlaDuration}]]></timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <sequenceFlow id="f_timer_escalation" sourceRef="approvalSlaTimer" targetRef="escalateApproval"/>
+
+    <serviceTask id="escalateApproval" name="Escalate Approval SLA"
+                 flowable:type="http" flowable:async="true">
+      <extensionElements>
+        <flowable:field name="requestMethod">
+          <flowable:string>POST</flowable:string>
+        </flowable:field>
+        <flowable:field name="requestUrl">
+          <flowable:expression><![CDATA[${escalationUrl}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="requestHeaders">
+          <flowable:string>Content-Type: application/json</flowable:string>
+        </flowable:field>
+        <flowable:field name="requestBody">
+          <flowable:expression><![CDATA[${escalationRequestBody}]]></flowable:expression>
+        </flowable:field>
+        <flowable:failedJobRetryTimeCycle>R10/PT5S</flowable:failedJobRetryTimeCycle>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="f_escalation_end" sourceRef="escalateApproval" targetRef="escalationEnd"/>
+    <endEvent id="escalationEnd" name="Escalation Recorded"/>
+
+    <sequenceFlow id="f_approval_result" sourceRef="parallelApprovals" targetRef="approvalOutcome"/>
+    <exclusiveGateway id="approvalOutcome" name="Approval Outcome"/>
+
+    <sequenceFlow id="f_approved" sourceRef="approvalOutcome" targetRef="approvedRoute">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approvedCount >= 3}]]></conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="f_rejected" sourceRef="approvalOutcome" targetRef="updateRejectedStatus">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rejectedCount >= 3}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- 5. Approved route and company registration -->
+    <exclusiveGateway id="approvedRoute" name="Approved Route Merge"/>
+    <sequenceFlow id="f_approved_register" sourceRef="approvedRoute" targetRef="registerCompany"/>
+
+    <serviceTask id="registerCompany" name="Register Company"
+                 flowable:type="http" flowable:async="true">
+      <extensionElements>
+        <flowable:field name="requestMethod">
+          <flowable:string>POST</flowable:string>
+        </flowable:field>
+        <flowable:field name="requestUrl">
+          <flowable:expression><![CDATA[${companyRegistrationUrl}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="requestHeaders">
+          <flowable:string>Content-Type: application/json</flowable:string>
+        </flowable:field>
+        <flowable:field name="requestBody">
+          <flowable:expression><![CDATA[${registrationRequestBody}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="failStatusCodes">
+          <flowable:string>4XX,5XX</flowable:string>
+        </flowable:field>
+        <flowable:failedJobRetryTimeCycle>R10/PT5S</flowable:failedJobRetryTimeCycle>
+      </extensionElements>
+    </serviceTask>
+
+    <sequenceFlow id="f_register_update_status"
+              sourceRef="registerCompany"
+              targetRef="updateApprovedStatus"/>
+
+    <serviceTask id="updateApprovedStatus"
+              name="Update Approved Investment Status"
+              flowable:type="http"
+              flowable:async="true">
+      <extensionElements>
+      <flowable:field name="requestMethod">
+      <flowable:string>POST</flowable:string>
+    </flowable:field>
+    <flowable:field name="requestUrl">
+      <flowable:expression><![CDATA[${approvedStatusUrl}]]></flowable:expression>
+    </flowable:field>
+    <flowable:field name="requestHeaders">
+      <flowable:string>Content-Type: application/json</flowable:string>
+    </flowable:field>
+    <flowable:field name="requestSecureHeaders">
+      <flowable:expression><![CDATA[${internalStatusSecureHeaders}]]></flowable:expression>
+    </flowable:field>
+    <flowable:field name="requestBody">
+      <flowable:expression><![CDATA[${approvedStatusBody}]]></flowable:expression>
+    </flowable:field>
+    <flowable:field name="failStatusCodes">
+      <flowable:string>4XX,5XX</flowable:string>
+    </flowable:field>
+    <flowable:failedJobRetryTimeCycle>R10/PT5S</flowable:failedJobRetryTimeCycle>
+  </extensionElements>
+</serviceTask>
+
+<sequenceFlow id="f_update_status_notify"
+              sourceRef="updateApprovedStatus"
+              targetRef="notifyApproved"/>
+
+    <serviceTask id="notifyApproved" name="Notify Investor — Approved"
+                 flowable:type="http" flowable:async="true">
+      <extensionElements>
+        <flowable:field name="requestMethod"><flowable:string>POST</flowable:string></flowable:field>
+        <flowable:field name="requestUrl"><flowable:expression><![CDATA[${notificationUrl}]]></flowable:expression></flowable:field>
+        <flowable:field name="requestHeaders"><flowable:string>Content-Type: application/json</flowable:string></flowable:field>
+        <flowable:field name="requestBody"><flowable:expression><![CDATA[${approvedNotificationBody}]]></flowable:expression></flowable:field>
+        <flowable:failedJobRetryTimeCycle>R10/PT5S</flowable:failedJobRetryTimeCycle>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="f_approved_end" sourceRef="notifyApproved" targetRef="approvedEnd"/>
+    <endEvent id="approvedEnd" name="Investment Approved"/>
+
+    <!-- 6. Rejected route -->
+    <serviceTask id="updateRejectedStatus" name="Update Rejected Investment Status"
+                 flowable:type="http" flowable:async="true">
+      <extensionElements>
+        <flowable:field name="requestMethod"><flowable:string>POST</flowable:string></flowable:field>
+        <flowable:field name="requestUrl"><flowable:expression><![CDATA[${rejectedStatusUrl}]]></flowable:expression></flowable:field>
+        <flowable:field name="requestHeaders"><flowable:string>Content-Type: application/json</flowable:string></flowable:field>
+        <flowable:field name="requestSecureHeaders">
+  <flowable:expression><![CDATA[${internalStatusSecureHeaders}]]></flowable:expression>
+</flowable:field>
+        <flowable:field name="requestBody"><flowable:expression><![CDATA[${rejectedStatusBody}]]></flowable:expression></flowable:field>
+        <flowable:failedJobRetryTimeCycle>R10/PT5S</flowable:failedJobRetryTimeCycle>
+      </extensionElements>
+    </serviceTask>
+
+
+
+    <sequenceFlow id="f_rejected_notify" sourceRef="updateRejectedStatus" targetRef="notifyRejected"/>
+
+    <serviceTask id="notifyRejected" name="Notify Investor — Rejected"
+                 flowable:type="http" flowable:async="true">
+      <extensionElements>
+        <flowable:field name="requestMethod"><flowable:string>POST</flowable:string></flowable:field>
+        <flowable:field name="requestUrl"><flowable:expression><![CDATA[${notificationUrl}]]></flowable:expression></flowable:field>
+        <flowable:field name="requestHeaders"><flowable:string>Content-Type: application/json</flowable:string></flowable:field>
+        <flowable:field name="requestBody"><flowable:expression><![CDATA[${rejectedNotificationBody}]]></flowable:expression></flowable:field>
+        <flowable:failedJobRetryTimeCycle>R10/PT5S</flowable:failedJobRetryTimeCycle>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="f_rejected_end" sourceRef="notifyRejected" targetRef="rejectedEnd"/>
+    <endEvent id="rejectedEnd" name="Investment Rejected"/>
+
+  </process>
+</definitions>

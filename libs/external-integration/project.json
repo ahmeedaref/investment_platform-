@@ -1,0 +1,9 @@
+{
+  "name": "external-integration",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/external-integration/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project external-integration --web",
+  "targets": {}
+}

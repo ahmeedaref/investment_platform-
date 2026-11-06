@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../libs/database/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum InvestmentStatus {
+  PENDING
+  IN_PROGRESS
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+enum ApprovalDecision {
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id         String   @id @default(uuid())
+  keycloakId String   @unique
+  email      String   @unique
+  firstName  String?
+  lastName   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  investments Investment[]
+}
+
+model Investment {
+  id                    String           @id @default(uuid())
+  companyName           String
+  investmentAmount      Decimal          @db.Decimal(15, 2)
+  nationalId            String?
+  taxRegistrationNumber String?
+  status                InvestmentStatus @default(PENDING)
+  processInstanceId     String?          @unique
+
+  investorId String
+  investor   User   @relation(fields: [investorId], references: [id])
+
+  approvalVotes ApprovalVote[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ApprovalVote {
+  id                  String           @id @default(uuid())
+  investmentId        String
+  approvalGroup       String
+  decision            ApprovalDecision
+  decidedByKeycloakId String
+  processTaskId       String           @unique
+  comment             String?
+  createdAt           DateTime         @default(now())
+  investment          Investment       @relation(fields: [investmentId], references: [id], onDelete: Cascade)
+
+  @@unique([investmentId, approvalGroup])
+  @@index([decidedByKeycloakId])
+}
