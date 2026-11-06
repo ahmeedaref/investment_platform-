@@ -1,6 +1,8 @@
+
 import {
   Injectable,
   InternalServerErrorException,
+  HttpException,
   Logger,
   OnModuleInit,
 } from "@nestjs/common";
@@ -34,7 +36,10 @@ export class FlowableService implements OnModuleInit {
     await this.ensureProcessDeployed();
   }
 
-  async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  async request<T>(
+    endpoint: string,
+    options: RequestInit = {},
+  ): Promise<T> {
     const credentials = Buffer.from(
       `${this.username}:${this.password}`,
     ).toString("base64");
@@ -52,18 +57,35 @@ export class FlowableService implements OnModuleInit {
     if (!response.ok) {
       const errorBody = await response.text();
 
-      this.logger.error(`Flowable API error: ${response.status} ${errorBody}`);
+      this.logger.error(
+        `Flowable API error: ${response.status} ${errorBody}`,
+      );
 
-      throw new InternalServerErrorException(
+      throw new HttpException(
+        errorBody ||
         `Flowable API request failed with status ${response.status}`,
+        response.status,
       );
     }
 
-    if (response.status === 204) {
+    const responseText = await response.text();
+
+    if (!responseText.trim()) {
       return undefined as T;
     }
 
-    return (await response.json()) as T;
+    try {
+      return JSON.parse(responseText) as T;
+    } catch {
+      this.logger.error(
+        `Flowable returned invalid JSON for ${endpoint}: ${responseText}`,
+      );
+
+      throw new InternalServerErrorException(
+        "Flowable returned an invalid response",
+      );
+    }
+
   }
 
   async getDeployments(): Promise<unknown> {
@@ -74,32 +96,32 @@ export class FlowableService implements OnModuleInit {
     return this.request("/repository/process-definitions");
   }
 
- async startInvestmentProcess(
-  data: StartInvestmentProcessDto,
-): Promise<{ id: string }> {
-  const integrationBaseUrl = (
-    this.configService.get<string>("EXTERNAL_INTEGRATION_BASE_URL") ??
-    "http://host.docker.internal:3002/api"
-  ).replace(/\/$/, "");
+  async startInvestmentProcess(
+    data: StartInvestmentProcessDto,
+  ): Promise<{ id: string }> {
+    const integrationBaseUrl = (
+      this.configService.get<string>("EXTERNAL_INTEGRATION_BASE_URL") ??
+      "http://host.docker.internal:3002/api"
+    ).replace(/\/$/, "");
 
-  const internalServiceSecret =
-    this.configService.getOrThrow<string>("INTERNAL_SERVICE_SECRET");
+    const internalServiceSecret =
+      this.configService.getOrThrow<string>("INTERNAL_SERVICE_SECRET");
 
-  const internalStatusUrl =
-    "http://host.docker.internal:3000/api/investments";
+    const internalStatusUrl =
+      "http://host.docker.internal:3000/api/investments";
 
-  const internalStatusSecureHeaders =
-    `x-internal-secret: ${internalServiceSecret}`;
+    const internalStatusSecureHeaders =
+      `x-internal-secret: ${internalServiceSecret}`;
 
-  const validationPayload = {
-    investmentId: data.investmentId,
-    investorId: data.investorId,
-    investorEmail: data.investorEmail,
-    companyName: data.companyName,
-    investmentAmount: data.investmentAmount,
-    nationalId: data.nationalId ?? null,
-    taxRegistrationNumber: data.taxRegistrationNumber ?? null,
-  };
+    const validationPayload = {
+      investmentId: data.investmentId,
+      investorId: data.investorId,
+      investorEmail: data.investorEmail,
+      companyName: data.companyName,
+      investmentAmount: data.investmentAmount,
+      nationalId: data.nationalId ?? null,
+      taxRegistrationNumber: data.taxRegistrationNumber ?? null,
+    };
 
     const response = await this.request<{ id: string }>(
       "/runtime/process-instances",
@@ -115,6 +137,21 @@ export class FlowableService implements OnModuleInit {
             { name: "companyName", value: data.companyName },
             { name: "investmentAmount", value: data.investmentAmount },
             { name: "nationalId", value: data.nationalId ?? null },
+
+            // Approval configuration
+            {
+              name: "approvalGroups",
+              value: [
+                "approval-group-1",
+                "approval-group-2",
+                "approval-group-3",
+                "approval-group-4",
+                "approval-group-5",
+              ],
+            },
+            { name: "approvedCount", value: 0 },
+            { name: "rejectedCount", value: 0 },
+
             {
               name: "approvedStatusUrl",
               value: `${internalStatusUrl}/${data.investmentId}/internal-status`,
@@ -200,6 +237,21 @@ export class FlowableService implements OnModuleInit {
               value: `${integrationBaseUrl}/integrations/notifications/send`,
             },
             {
+              name: "escalationUrl",
+              value: `${integrationBaseUrl}/integrations/notifications/send`,
+            },
+            {
+              name: "escalationRequestBody",
+              value: JSON.stringify({
+                investmentId: data.investmentId,
+                recipientEmail: this.configService.getOrThrow<string>(
+                  "ESCALATION_EMAIL",
+                ),
+                subject: "Investment Approval SLA Breached",
+                message: `The approval SLA has been breached for investment ${data.investmentId}, company ${data.companyName}. Please review the pending approval tasks.`,
+              }),
+            },
+            {
               name: "approvedNotificationBody",
               value: JSON.stringify({
                 investmentId: data.investmentId,
@@ -227,7 +279,6 @@ export class FlowableService implements OnModuleInit {
     return response;
   }
 
-
   private async ensureProcessDeployed(): Promise<void> {
     const result = await this.request<{
       data?: Array<{ key: string }>;
@@ -235,7 +286,11 @@ export class FlowableService implements OnModuleInit {
       "/repository/process-definitions?key=investmentApproval&latest=true&size=1",
     );
 
-    if (result.data?.some((definition) => definition.key === "investmentApproval")) {
+    if (
+      result.data?.some(
+        (definition) => definition.key === "investmentApproval",
+      )
+    ) {
       this.logger.log("Investment Approval process is already deployed");
       return;
     }
@@ -282,7 +337,7 @@ export class FlowableService implements OnModuleInit {
       );
     }
 
-    const deployment = await response.json() as { id: string };
+    const deployment = (await response.json()) as { id: string };
 
     this.logger.log(
       `Investment Approval BPMN deployed successfully: ${deployment.id}`,

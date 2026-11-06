@@ -9,14 +9,23 @@
            name="Investment Approval and Company Establishment"
            isExecutable="true">
 
-    <!-- Process input variables:
-         investorId, companyName, investmentAmount, nationalId, companyId
-         approvalGroups, approvedCount=0, rejectedCount=0
-         approvalSlaDuration, escalationGroup
-         missingData, verificationRequestBody, taxRequestBody
-         riskRequestBody, registrationRequestBody, notificationRequestBody
-         nationalIdVerificationUrl, taxVerificationUrl, riskEvaluationUrl
-         companyRegistrationUrl, notificationUrl, escalationUrl
+    <!-- Process variables:
+         investmentId, investorId, investorEmail,
+         companyName, investmentAmount, nationalId,
+         taxRegistrationNumber,
+         approvalGroups, approvedCount=0, rejectedCount=0,
+         missingData,
+         validationRequestBody, verificationRequestBody,
+         taxRequestBody, riskRequestBody,
+         registrationRequestBody, notificationRequestBody,
+         escalationRequestBody,
+         validateRequestUrl, nationalIdVerificationUrl,
+         taxVerificationUrl, riskEvaluationUrl,
+         companyRegistrationUrl, notificationUrl,
+         escalationUrl,
+         approvedStatusUrl, rejectedStatusUrl,
+         approvedStatusBody, rejectedStatusBody,
+         internalStatusSecureHeaders
     -->
 
     <startEvent id="startInvestment" name="Investment Request Received"/>
@@ -178,11 +187,11 @@
       </multiInstanceLoopCharacteristics>
     </userTask>
 
-    <!-- SLA timer: duration supplied as PT24H or PT48H -->
+    <!-- MEDIUM: 24 hours | HIGH: 48 hours -->
     <boundaryEvent id="approvalSlaTimer" name="Approval SLA Breached"
                    attachedToRef="parallelApprovals" cancelActivity="false">
       <timerEventDefinition>
-        <timeDuration xsi:type="tFormalExpression"><![CDATA[${approvalSlaDuration}]]></timeDuration>
+        <timeDuration xsi:type="tFormalExpression"><![CDATA[${riskResponse.riskLevel == 'HIGH' ? 'PT48H' : 'PT24H'}]]></timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
 
