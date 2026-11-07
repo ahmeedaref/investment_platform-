@@ -1,0 +1,364 @@
+{
+  "info": {
+    "_postman_id": "14b848ac-3ea2-4459-9028-1ecdb1ef850a",
+    "name": "investments_PostMan",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "37775038"
+  },
+  "item": [
+    {
+      "name": "create investment",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1cHVwN1RmeXMzbFhoMkh0SmNpYUxlaGstQ0gzZXNUQ0VkcERkWWlQNUtrIn0.eyJleHAiOjE3OTQwNjgxNjIsImlhdCI6MTc5NDA2Nzg2MiwianRpIjoiY2Y1MDRlNjktNTAyMS00YTk3LTllNGQtN2I4NDlhYTFmYzQ5IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy9pbnZlc3RtZW50LXBsYXRmb3JtIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6IjViYzEwYmQ3LWJhN2YtNGJjNS05ODg2LTdlNDAyYzMwYjMzMyIsInR5cCI6IkJlYXJlciIsImF6cCI6ImludmVzdG1lbnQtYXBpIiwic2Vzc2lvbl9zdGF0ZSI6ImVlZmFmZjY3LTE1ZWItNDNiYy04MDdiLWMzYmFjZWY1MDg5MSIsImFjciI6IjEiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsIlVTRVIiLCJkZWZhdWx0LXJvbGVzLWludmVzdG1lbnQtcGxhdGZvcm0iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2lkIjoiZWVmYWZmNjctMTVlYi00M2JjLTgwN2ItYzNiYWNlZjUwODkxIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJhdXRvIHRlc3QiLCJncm91cHMiOltdLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhdXRvX3Rlc3QiLCJnaXZlbl9uYW1lIjoiYXV0byIsImZhbWlseV9uYW1lIjoidGVzdCIsImVtYWlsIjoiYXV0b0B0ZXN0LmNvbSJ9.uCbQvUw4PzhOhdgWDXbi5nsNhqW-QTNHmwWeSliHohg3PY792t_QHFdxqbYvq4_yxDS1GFfM-jBsJYH344-iv9GioZLw4E2GbMvgMqsueCtEAB__joiar88UtcemSMTIvD84rz4ABT6ilV_z3_8elUqqbcRx8HCNKw51pSoh2WPyTQYX8IRHESPBY_cLqDyjqxdR-XVIneyxE6zcA1ZCIYYJ45vsSphFKnZArtT05Ra9_AnqFPyDjw49nYyCR8eriJ9MdO37q-g7UJf7-OjBNySh80IhXIUHU9IcEviA8FylhIQ-XpfaibsrIcK5hOVwE_O8pMRJMnwCb22FJ7kG7w",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"companyName\": \"E2E High Risk Test\",\r\n  \"investmentAmount\": 1500000,\r\n  \"nationalId\": \"12345678901234\",\r\n  \"taxRegistrationNumber\": \"TAX-HIGH-001\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/investments",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "investments"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get investments",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1cHVwN1RmeXMzbFhoMkh0SmNpYUxlaGstQ0gzZXNUQ0VkcERkWWlQNUtrIn0.eyJleHAiOjE3OTQwNjg4NzAsImlhdCI6MTc5NDA2ODU3MCwianRpIjoiOTI4NWE1NmUtMTdmZC00MzYxLTg4YzgtZDMwNTQyNWU0ZjkzIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy9pbnZlc3RtZW50LXBsYXRmb3JtIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6IjIyYTMxNWZlLTA2YjAtNDM4Ni04ODI3LTk0MGQ3ZmMyZWNhMCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImludmVzdG1lbnQtYXBpIiwic2Vzc2lvbl9zdGF0ZSI6IjExNjY2NjIyLWQyYjktNDQzNy05ZWM3LTFiMDNmNzZiZDcyMCIsImFjciI6IjEiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtaW52ZXN0bWVudC1wbGF0Zm9ybSIsIkFQUFJPVkVSIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGdyb3VwcyBlbWFpbCIsInNpZCI6IjExNjY2NjIyLWQyYjktNDQzNy05ZWM3LTFiMDNmNzZiZDcyMCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiYXBwcm92ZXIzIHRlc3QiLCJncm91cHMiOlsiYXBwcm92YWwtZ3JvdXAtMyJdLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhcHByb3Zlcl90ZXN0MyIsImdpdmVuX25hbWUiOiJhcHByb3ZlcjMiLCJmYW1pbHlfbmFtZSI6InRlc3QiLCJlbWFpbCI6ImFwcHJvdmVyX3Rlc3QzQHRlc3QuY29tIn0.WVTL5chjWUQoqA6KgRd6nn-9T_OOsfFiSYIqXCcsiTTYKJaxTFWO_KBd4FHhJgB5XOhlGQ4JGe8fhoBUeVXES5J8tNK_fw6ipXf4d3NtWZqWjd6n1sa547ZH-R-8mnkAX8sho5MjE4MnPLW-IDJGWTCTx9cw2ZYAuKf-ToVNSRILLb1ewNAO-AsuwBamZxKEGunnHJQDN0LBYGg0pKetwCd3ogI5SvAVQiOPBX3iqNBaPabwV8C2JW9PQBUZzVOmcEk9lP3mGk7iAkx0JXSg8XiYbAUZ1ltJlraZsBCReJufWmO1iaZp1pokh8SW0dVcZX8Z3NF8MTRw34VKHCqDyQ",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/investments",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "investments"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "keycloak",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "grant_type",
+              "value": "password"
+            },
+            {
+              "key": "client_id",
+              "value": "investment-api"
+            },
+            {
+              "key": "username",
+              "value": "approver_test3"
+            },
+            {
+              "key": "password",
+              "value": "12345"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:8081/realms/investment-platform/protocol/openid-connect/token",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "realms",
+            "investment-platform",
+            "protocol",
+            "openid-connect",
+            "token"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "claim task",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1cHVwN1RmeXMzbFhoMkh0SmNpYUxlaGstQ0gzZXNUQ0VkcERkWWlQNUtrIn0.eyJleHAiOjE3OTQwNjg4NzAsImlhdCI6MTc5NDA2ODU3MCwianRpIjoiOTI4NWE1NmUtMTdmZC00MzYxLTg4YzgtZDMwNTQyNWU0ZjkzIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy9pbnZlc3RtZW50LXBsYXRmb3JtIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6IjIyYTMxNWZlLTA2YjAtNDM4Ni04ODI3LTk0MGQ3ZmMyZWNhMCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImludmVzdG1lbnQtYXBpIiwic2Vzc2lvbl9zdGF0ZSI6IjExNjY2NjIyLWQyYjktNDQzNy05ZWM3LTFiMDNmNzZiZDcyMCIsImFjciI6IjEiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtaW52ZXN0bWVudC1wbGF0Zm9ybSIsIkFQUFJPVkVSIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGdyb3VwcyBlbWFpbCIsInNpZCI6IjExNjY2NjIyLWQyYjktNDQzNy05ZWM3LTFiMDNmNzZiZDcyMCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiYXBwcm92ZXIzIHRlc3QiLCJncm91cHMiOlsiYXBwcm92YWwtZ3JvdXAtMyJdLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhcHByb3Zlcl90ZXN0MyIsImdpdmVuX25hbWUiOiJhcHByb3ZlcjMiLCJmYW1pbHlfbmFtZSI6InRlc3QiLCJlbWFpbCI6ImFwcHJvdmVyX3Rlc3QzQHRlc3QuY29tIn0.WVTL5chjWUQoqA6KgRd6nn-9T_OOsfFiSYIqXCcsiTTYKJaxTFWO_KBd4FHhJgB5XOhlGQ4JGe8fhoBUeVXES5J8tNK_fw6ipXf4d3NtWZqWjd6n1sa547ZH-R-8mnkAX8sho5MjE4MnPLW-IDJGWTCTx9cw2ZYAuKf-ToVNSRILLb1ewNAO-AsuwBamZxKEGunnHJQDN0LBYGg0pKetwCd3ogI5SvAVQiOPBX3iqNBaPabwV8C2JW9PQBUZzVOmcEk9lP3mGk7iAkx0JXSg8XiYbAUZ1ltJlraZsBCReJufWmO1iaZp1pokh8SW0dVcZX8Z3NF8MTRw34VKHCqDyQ",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/approvals/tasks/f2f32765-dac5-11f1-91a0-a2b038160dfe/claim",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "approvals",
+            "tasks",
+            "f2f32765-dac5-11f1-91a0-a2b038160dfe",
+            "claim"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "decision task",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1cHVwN1RmeXMzbFhoMkh0SmNpYUxlaGstQ0gzZXNUQ0VkcERkWWlQNUtrIn0.eyJleHAiOjE3OTQwNjg4NzAsImlhdCI6MTc5NDA2ODU3MCwianRpIjoiOTI4NWE1NmUtMTdmZC00MzYxLTg4YzgtZDMwNTQyNWU0ZjkzIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy9pbnZlc3RtZW50LXBsYXRmb3JtIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6IjIyYTMxNWZlLTA2YjAtNDM4Ni04ODI3LTk0MGQ3ZmMyZWNhMCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImludmVzdG1lbnQtYXBpIiwic2Vzc2lvbl9zdGF0ZSI6IjExNjY2NjIyLWQyYjktNDQzNy05ZWM3LTFiMDNmNzZiZDcyMCIsImFjciI6IjEiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtaW52ZXN0bWVudC1wbGF0Zm9ybSIsIkFQUFJPVkVSIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGdyb3VwcyBlbWFpbCIsInNpZCI6IjExNjY2NjIyLWQyYjktNDQzNy05ZWM3LTFiMDNmNzZiZDcyMCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiYXBwcm92ZXIzIHRlc3QiLCJncm91cHMiOlsiYXBwcm92YWwtZ3JvdXAtMyJdLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhcHByb3Zlcl90ZXN0MyIsImdpdmVuX25hbWUiOiJhcHByb3ZlcjMiLCJmYW1pbHlfbmFtZSI6InRlc3QiLCJlbWFpbCI6ImFwcHJvdmVyX3Rlc3QzQHRlc3QuY29tIn0.WVTL5chjWUQoqA6KgRd6nn-9T_OOsfFiSYIqXCcsiTTYKJaxTFWO_KBd4FHhJgB5XOhlGQ4JGe8fhoBUeVXES5J8tNK_fw6ipXf4d3NtWZqWjd6n1sa547ZH-R-8mnkAX8sho5MjE4MnPLW-IDJGWTCTx9cw2ZYAuKf-ToVNSRILLb1ewNAO-AsuwBamZxKEGunnHJQDN0LBYGg0pKetwCd3ogI5SvAVQiOPBX3iqNBaPabwV8C2JW9PQBUZzVOmcEk9lP3mGk7iAkx0JXSg8XiYbAUZ1ltJlraZsBCReJufWmO1iaZp1pokh8SW0dVcZX8Z3NF8MTRw34VKHCqDyQ",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"decision\": \"APPROVED\",\r\n  \"comment\": \"E2E test - third group approve\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/approvals/tasks/f2f32765-dac5-11f1-91a0-a2b038160dfe/decision",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "approvals",
+            "tasks",
+            "f2f32765-dac5-11f1-91a0-a2b038160dfe",
+            "decision"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get to approval tasks",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1cHVwN1RmeXMzbFhoMkh0SmNpYUxlaGstQ0gzZXNUQ0VkcERkWWlQNUtrIn0.eyJleHAiOjE3OTQwNjg4MTUsImlhdCI6MTc5NDA2ODUxNSwianRpIjoiNjgxZDI2ZDMtZDI1Ni00NjVkLTk4NTQtNmQyMjc0ZDE3NzlkIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy9pbnZlc3RtZW50LXBsYXRmb3JtIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6IjIyYTMxNWZlLTA2YjAtNDM4Ni04ODI3LTk0MGQ3ZmMyZWNhMCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImludmVzdG1lbnQtYXBpIiwic2Vzc2lvbl9zdGF0ZSI6ImFmOTBjZjhkLWNmMjQtNGYzMi1iNDg1LWUwODI5MjAwZjZkMCIsImFjciI6IjEiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtaW52ZXN0bWVudC1wbGF0Zm9ybSIsIkFQUFJPVkVSIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGdyb3VwcyBlbWFpbCIsInNpZCI6ImFmOTBjZjhkLWNmMjQtNGYzMi1iNDg1LWUwODI5MjAwZjZkMCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiYXBwcm92ZXIzIHRlc3QiLCJncm91cHMiOlsiYXBwcm92YWwtZ3JvdXAtMyJdLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhcHByb3Zlcl90ZXN0MyIsImdpdmVuX25hbWUiOiJhcHByb3ZlcjMiLCJmYW1pbHlfbmFtZSI6InRlc3QiLCJlbWFpbCI6ImFwcHJvdmVyX3Rlc3QzQHRlc3QuY29tIn0.oKAi_NC3jh_CCtqrUtbZv6zJOez_Ij0hWyA7atQNVTLhKuPmKj6oVOdu3FvnBC9eHkJEYVSINWK0ISVhCrNhu-P4Y2emtbh7LXzXcJwY-H256WOOUg6yjDmjyQ7MJArxseK9Lq7I9VBFxslz9t5L-WDi3GzkVKT_3bUUHUZT51cSuY9vf9SlHIpSbl6ZxwvUrjGJG1nrkcfVsubiGUQdGdl4lR596rYyNkH2axATLRoooYtzx5szrVgzuek1nwgEEsY8pQIlMu5CAwlFS8TpwGPJSD6A7GoKS9-fL25V-W12mMZ67vSjtimMZjhtDm_ajelfXiK14zClGqGgwgfoRA",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/approvals/tasks",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "approvals",
+            "tasks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "risk evaluate",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1cHVwN1RmeXMzbFhoMkh0SmNpYUxlaGstQ0gzZXNUQ0VkcERkWWlQNUtrIn0.eyJleHAiOjE3OTQwNjMwMjksImlhdCI6MTc5NDA2MjcyOSwianRpIjoiODA0ZmJjODEtN2NkZS00ZjdiLWI1ZWQtMWZjM2UzYTFiMzc0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy9pbnZlc3RtZW50LXBsYXRmb3JtIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6IjViYzEwYmQ3LWJhN2YtNGJjNS05ODg2LTdlNDAyYzMwYjMzMyIsInR5cCI6IkJlYXJlciIsImF6cCI6ImludmVzdG1lbnQtYXBpIiwic2Vzc2lvbl9zdGF0ZSI6IjY1MTdiNTE1LTQxOWYtNDFhOC04M2MwLWNmNmIyNTAxNzM1NCIsImFjciI6IjEiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsIlVTRVIiLCJkZWZhdWx0LXJvbGVzLWludmVzdG1lbnQtcGxhdGZvcm0iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2lkIjoiNjUxN2I1MTUtNDE5Zi00MWE4LTgzYzAtY2Y2YjI1MDE3MzU0IiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJhdXRvIHRlc3QiLCJncm91cHMiOltdLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhdXRvX3Rlc3QiLCJnaXZlbl9uYW1lIjoiYXV0byIsImZhbWlseV9uYW1lIjoidGVzdCIsImVtYWlsIjoiYXV0b0B0ZXN0LmNvbSJ9.GjKyXcwsbT-RWgusFLUan-MJYZnbcnwktbgklQvaRHSm9djLO7MMbulbfYqlfcgxGui5sb6EFyezjbQLIkUsmvgSSFhrNyVSuqfiB34BPGta479zpBLWHn1nNPWM4mNNPE1Tlxkvndrh1L2u1rqJZuRrLDzhjL2uRkLBcy6iLro1sqtTVs21ZmfsOCO8_97A79iSfYGon80V-kamYyA688BRGZwQkZ5-G8lV0YgnTcM4cipXWH-guENNQjcvFGSeVp-Kkr8hGUbknpLF35g8tYzgEblCAkNai1Y7niGJOF4Wruou4J_lMkH0_3qyBKMikVFs6K-xkArvgPcwtVBE5A",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"investmentAmount\": 1500000\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/integrations/risk/evaluate",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "integrations",
+            "risk",
+            "evaluate"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "verify National Id",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1cHVwN1RmeXMzbFhoMkh0SmNpYUxlaGstQ0gzZXNUQ0VkcERkWWlQNUtrIn0.eyJleHAiOjE3OTQwNjMyMzYsImlhdCI6MTc5NDA2MjkzNiwianRpIjoiMGU4M2YzZTctMjlhNy00NTdhLWJlNmMtZjAyN2JhZGRjZmNjIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy9pbnZlc3RtZW50LXBsYXRmb3JtIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6IjViYzEwYmQ3LWJhN2YtNGJjNS05ODg2LTdlNDAyYzMwYjMzMyIsInR5cCI6IkJlYXJlciIsImF6cCI6ImludmVzdG1lbnQtYXBpIiwic2Vzc2lvbl9zdGF0ZSI6ImYzNDc5MzE2LTE1M2MtNGI2NS1iNjcyLTM3M2FkOTA2MzYxNCIsImFjciI6IjEiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsIlVTRVIiLCJkZWZhdWx0LXJvbGVzLWludmVzdG1lbnQtcGxhdGZvcm0iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2lkIjoiZjM0NzkzMTYtMTUzYy00YjY1LWI2NzItMzczYWQ5MDYzNjE0IiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJhdXRvIHRlc3QiLCJncm91cHMiOltdLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhdXRvX3Rlc3QiLCJnaXZlbl9uYW1lIjoiYXV0byIsImZhbWlseV9uYW1lIjoidGVzdCIsImVtYWlsIjoiYXV0b0B0ZXN0LmNvbSJ9.CKk9-Pel2tIhdIr2xtMsS5QlbavRzs8rNJ0Q9lP0CtE_jSJeayukDFX4ixuKuEqhJojxDBvsCZUVIdqJWupBokw8NRC8sjYTxwn8dtyOTjB-LfQgIzZm4zAFYxcfcGZDCXhAgErHZgYRA7qzR25f-9L-ZTJC0X2-cV2oIN95Ak0TbiTIYODwo2CZc_zxz5-0lluIEFmHEzqYM8kfRIj1awYibuVyF0vM1iZs8wj8Fl9xS_cRog4oaj15LcbNc2qWDdgKuQzd26NZ3d6aYgYuo96vSkU-r-UfJ17LVIH2GE2KlK6x_n7rpQDujEFnPq1qkvitGdcCZn-IHcF_zLQ4aQ",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nationalId\": \"12345678901234\",\r\n  \"investorId\": \"f7f1a340-3a92-48d6-bc74-ae794bead986\",\r\n  \"investmentId\": \"23d3dfef-a429-402b-baf3-a1ed68a157bc\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/integrations/national-id/verify",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "integrations",
+            "national-id",
+            "verify"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "verify tax-clearance",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1cHVwN1RmeXMzbFhoMkh0SmNpYUxlaGstQ0gzZXNUQ0VkcERkWWlQNUtrIn0.eyJleHAiOjE3OTQwNjMzNzMsImlhdCI6MTc5NDA2MzA3MywianRpIjoiMzlmM2UxYmYtNDc3ZS00OGMxLTg4NzAtNDk4NmY3OWI3ZGJiIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy9pbnZlc3RtZW50LXBsYXRmb3JtIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6IjViYzEwYmQ3LWJhN2YtNGJjNS05ODg2LTdlNDAyYzMwYjMzMyIsInR5cCI6IkJlYXJlciIsImF6cCI6ImludmVzdG1lbnQtYXBpIiwic2Vzc2lvbl9zdGF0ZSI6ImY1N2U5OTM0LTk4YmYtNGQwZi05ZDIxLTYyY2ZiMThhNGYwMSIsImFjciI6IjEiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsIlVTRVIiLCJkZWZhdWx0LXJvbGVzLWludmVzdG1lbnQtcGxhdGZvcm0iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2lkIjoiZjU3ZTk5MzQtOThiZi00ZDBmLTlkMjEtNjJjZmIxOGE0ZjAxIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJhdXRvIHRlc3QiLCJncm91cHMiOltdLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhdXRvX3Rlc3QiLCJnaXZlbl9uYW1lIjoiYXV0byIsImZhbWlseV9uYW1lIjoidGVzdCIsImVtYWlsIjoiYXV0b0B0ZXN0LmNvbSJ9.Mx7wO3QPqJq2_2YCi4WydwOfKEfFtqTirKmFhPo3lxNHdIwwRdWpRnNgTUvJrnE55rKsBO9gauSExhJynuzTbXVLu7xIGWvVRLZR0q1TSZWHXtCadwtLfArsWmWNN1Y1pZl25zCeeg3jaOZ-w9MldN2bhpKU08-KLzRN1Kbt1sfPJFKB-a7GkEBzn9QCXbgNqsvcNsTaPefjg-nTYZGqxUSMWP3tcoRJ_Xwl0m8Nwyd-ddM0U9BtOI0uP16oh-8F7VIAqOrY8-T9W8M6GobgMtzTusECRdeijYnYnjsEBhrhI4naPP_PTEzWgj3R4_NZnmhXnwy0FqxnB5YzZ67VbA",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"taxRegistrationNumber\": \"TAX-E2E-001\",\r\n  \"investorId\": \"f7f1a340-3a92-48d6-bc74-ae794bead986\",\r\n  \"investmentId\": \"23d3dfef-a429-402b-baf3-a1ed68a157bc\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/integrations/tax-clearance/verify",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "integrations",
+            "tax-clearance",
+            "verify"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -129,7 +129,7 @@ export class FlowableService implements OnModuleInit {
       this.configService.getOrThrow<string>("INTERNAL_SERVICE_SECRET");
 
     const internalStatusUrl =
-      "http://host.docker.internal:3000/api/investments";
+      "http://host.docker.internal:3003/api/investments";
 
     const internalStatusSecureHeaders =
       `x-internal-secret: ${internalServiceSecret}`;
@@ -301,21 +301,6 @@ export class FlowableService implements OnModuleInit {
   }
 
   private async ensureProcessDeployed(): Promise<void> {
-    const result = await this.request<{
-      data?: Array<{ key: string }>;
-    }>(
-      "/repository/process-definitions?key=investmentApproval&latest=true&size=1",
-    );
-
-    if (
-      result.data?.some(
-        (definition) => definition.key === "investmentApproval",
-      )
-    ) {
-      this.logger.log("Investment Approval process is already deployed");
-      return;
-    }
-
     const filePath = resolve(
       process.cwd(),
       "apps/workflow-service/src/assets/processes/investment-approval.bpmn",

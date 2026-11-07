@@ -182,7 +182,7 @@
           flowable:collection="${approvalGroups}"
           flowable:elementVariable="approvalGroup">
         <completionCondition xsi:type="tFormalExpression"><![CDATA[
-          ${approvedCount >= 3 || rejectedCount >= 3}
+          ${approvedCount >= 3 || rejectedCount >= 1}
         ]]></completionCondition>
       </multiInstanceLoopCharacteristics>
     </userTask>
@@ -226,7 +226,7 @@
     </sequenceFlow>
 
     <sequenceFlow id="f_rejected" sourceRef="approvalOutcome" targetRef="updateRejectedStatus">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rejectedCount >= 3}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rejectedCount >= 1}]]></conditionExpression>
     </sequenceFlow>
 
     <!-- 5. Approved route and company registration -->

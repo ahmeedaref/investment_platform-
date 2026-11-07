@@ -1,29 +1,97 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
 
-import { Logger } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app/app.module';
+import { Logger } from "@nestjs/common";
+import { NestFactory } from "@nestjs/core";
+import type { Request, Response } from "express";
+import { createProxyMiddleware } from "http-proxy-middleware";
+import { AppModule } from "./app/app.module";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const globalPrefix = 'api';
-  app.setGlobalPrefix(globalPrefix);
-  const port = process.env.PORT || 3000;
-  await app.listen(port);
-  // Set when Nx waits for this server to be ready
-  if (process.env.NX_READY_SIGNAL_SOCKET) {
-    try {
-      // Function keeps TypeScript and bundlers from rewriting or bundling the import
-      const load = new Function('s', 'return import(s)') as (s: string) => Promise<{ emitReadySignal(server: unknown): boolean }>;
-      (await load('@nx/js/ready-signal')).emitReadySignal(app.getHttpServer());
-    } catch {
-      // @nx/js isn't installed
+  // Disable body parsing so the proxy can forward request streams correctly.
+  const app = await NestFactory.create(AppModule, {
+    bodyParser: false,
+  });
+
+  const targets = {
+    investments: process.env.INVESTMENT_SERVICE_URL,
+    approvals: process.env.WORKFLOW_SERVICE_URL,
+    integrations: process.env.EXTERNAL_INTEGRATION_SERVICE_URL,
+  };
+
+  for (const [name, target] of Object.entries(targets)) {
+    if (!target) {
+      throw new Error(`Missing service URL: ${name}`);
     }
   }
-  Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`);
+
+  app.use(
+    createProxyMiddleware({
+      pathFilter: (_pathname, req) => {
+        const path = new URL(
+          (req as unknown as Request).originalUrl,
+          "http://localhost",
+        ).pathname;
+
+        // Do not expose the internal investment status endpoint.
+        if (/^\/api\/investments\/[^/]+\/internal-status\/?$/.test(path)) {
+          return false;
+        }
+
+        return (
+          path === "/api/investments" ||
+          path.startsWith("/api/investments/") ||
+          path === "/api/approvals" ||
+          path.startsWith("/api/approvals/") ||
+          path === "/api/integrations" ||
+          path.startsWith("/api/integrations/")
+        );
+      },
+
+      router: (req) => {
+        const path = new URL(
+          (req as unknown as Request).originalUrl,
+          "http://localhost",
+        ).pathname;
+
+        if (
+          path === "/api/investments" ||
+          path.startsWith("/api/investments/")
+        ) {
+          return targets.investments!;
+        }
+
+        if (
+          path === "/api/approvals" ||
+          path.startsWith("/api/approvals/")
+        ) {
+          return targets.approvals!;
+        }
+
+        return targets.integrations!;
+      },
+
+      changeOrigin: true,
+
+      logger: console,
+
+      on: {
+        error: (error, _req, res) => {
+          Logger.error(`Gateway proxy error: ${error.message}`);
+
+          const response = res as unknown as Response;
+
+          if (!response.headersSent) {
+            response.status(502).send("Bad Gateway");
+          }
+        },
+      },
+    }),
+  );
+
+  const port = process.env.API_GATEWAY_PORT || 3000;
+
+  await app.listen(port);
+
+  Logger.log(`API Gateway running at http://localhost:${port}/api`);
 }
 
 bootstrap();
