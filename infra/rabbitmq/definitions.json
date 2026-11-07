@@ -1,0 +1,61 @@
+{
+"vhosts": [
+  {
+    "name": "/"
+  }
+],
+  "exchanges": [
+    {
+      "name": "investment.events.dlx",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "investment-platform-events.retry",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-message-ttl": 5000,
+        "x-dead-letter-exchange": "",
+        "x-dead-letter-routing-key": "investment-platform-events"
+      }
+    },
+    {
+      "name": "investment-platform-events.dlq",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "policies": [
+    {
+      "vhost": "/",
+      "name": "investment-events-dlx",
+      "pattern": "^investment-platform-events$",
+      "apply-to": "queues",
+      "definition": {
+        "dead-letter-exchange": "investment.events.dlx",
+        "dead-letter-routing-key": "investment.events.dead"
+      },
+      "priority": 10
+    }
+  ],
+  "bindings": [
+    {
+      "source": "investment.events.dlx",
+      "vhost": "/",
+      "destination": "investment-platform-events.dlq",
+      "destination_type": "queue",
+      "routing_key": "investment.events.dead",
+      "arguments": {}
+    }
+  ]
+}

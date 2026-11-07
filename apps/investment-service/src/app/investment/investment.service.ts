@@ -1,26 +1,14 @@
+
 import {
   Injectable,
-  InternalServerErrorException,
-  Logger,
   NotFoundException,
 } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "@investment-platform/database";
 import { CreateInvestmentDto } from "./dto/create-investment.dto";
 
 @Injectable()
 export class InvestmentService {
-  private readonly logger = new Logger(InvestmentService.name);
-  private readonly workflowServiceUrl: string;
-
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly configService: ConfigService,
-  ) {
-    this.workflowServiceUrl = this.configService
-      .getOrThrow<string>("WORKFLOW_SERVICE_URL")
-      .replace(/\/$/, "");
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAll() {
     return this.prisma.investment.findMany({
@@ -56,9 +44,7 @@ export class InvestmentService {
     },
   ) {
     const investor = await this.prisma.user.upsert({
-      where: {
-        keycloakId: keycloakUser.sub,
-      },
+      where: { keycloakId: keycloakUser.sub },
       update: {},
       create: {
         keycloakId: keycloakUser.sub,
@@ -68,90 +54,57 @@ export class InvestmentService {
       },
     });
 
-    const investment = await this.prisma.investment.create({
-      data: {
-        companyName: dto.companyName,
-        investmentAmount: dto.investmentAmount,
-        nationalId: dto.nationalId,
-        taxRegistrationNumber: dto.taxRegistrationNumber,
-        investorId: investor.id,
-      },
-    });
+    const investment = await this.prisma.$transaction(async (tx) => {
+      const createdInvestment = await tx.investment.create({
+        data: {
+          companyName: dto.companyName,
+          investmentAmount: dto.investmentAmount,
+          nationalId: dto.nationalId,
+          taxRegistrationNumber: dto.taxRegistrationNumber,
+          investorId: investor.id,
+        },
+      });
 
-    try {
-      const response = await fetch(
-        `${this.workflowServiceUrl}/flowable/start-investment`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            investmentId: investment.id,
+      await tx.outboxEvent.create({
+        data: {
+          eventType: "investment.created",
+          aggregateId: createdInvestment.id,
+          payload: {
+            investmentId: createdInvestment.id,
             investorId: investor.id,
             investorEmail: investor.email,
-            companyName: investment.companyName,
-            investmentAmount: Number(investment.investmentAmount),
-            nationalId: investment.nationalId,
-            taxRegistrationNumber: investment.taxRegistrationNumber,
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        const errorBody = await response.text();
-
-        this.logger.error(
-          `Workflow Service error: ${response.status} ${errorBody}`,
-        );
-
-        throw new Error(
-          `Workflow Service returned status ${response.status}`,
-        );
-      }
-
-      const workflow = (await response.json()) as { id: string };
-
-      if (!workflow.id) {
-        throw new Error("Workflow Service returned no process instance ID");
-      }
-
-      return await this.prisma.investment.update({
-        where: { id: investment.id },
-        data: {
-          processInstanceId: workflow.id,
-          status: "IN_PROGRESS",
-        },
-        select: {
-          id: true,
-          companyName: true,
-          investmentAmount: true,
-          status: true,
-          processInstanceId: true,
-          investorId: true,
-          createdAt: true,
-          updatedAt: true,
-          investor: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
-            },
+            companyName: createdInvestment.companyName,
+            investmentAmount: Number(createdInvestment.investmentAmount),
+            nationalId: createdInvestment.nationalId,
+            taxRegistrationNumber: createdInvestment.taxRegistrationNumber,
           },
         },
       });
-    } catch (error) {
-      this.logger.error(
-        `Failed to start workflow for investment ${investment.id}`,
-        error instanceof Error ? error.stack : undefined,
-      );
 
-      throw new InternalServerErrorException(
-        `Investment ${investment.id} was saved, but its workflow could not be started.`,
-      );
-    }
+      return createdInvestment;
+    });
+
+    return this.prisma.investment.findUnique({
+      where: { id: investment.id },
+      select: {
+        id: true,
+        companyName: true,
+        investmentAmount: true,
+        status: true,
+        processInstanceId: true,
+        investorId: true,
+        createdAt: true,
+        updatedAt: true,
+        investor: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+    });
   }
 
   async updateStatus(

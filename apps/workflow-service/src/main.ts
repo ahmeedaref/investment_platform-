@@ -1,14 +1,33 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
+
 
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app/app.module";
+import { Transport } from "@nestjs/microservices";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const rabbitmqUrl = process.env.RABBITMQ_URL;
+const rabbitmqQueue = process.env.RABBITMQ_DEFAULT_QUEUE;
+
+if (!rabbitmqUrl || !rabbitmqQueue) {
+  throw new Error("RabbitMQ environment variables are missing");
+}
+
+app.connectMicroservice({
+  transport: Transport.RMQ,
+  options: {
+    urls: [rabbitmqUrl],
+    queue: rabbitmqQueue,
+    queueOptions: {
+      durable: true,
+    },
+    noAck: false,
+    prefetchCount: 10,
+  },
+});
+
+await app.startAllMicroservices();
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

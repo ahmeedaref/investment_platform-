@@ -96,6 +96,27 @@ export class FlowableService implements OnModuleInit {
     return this.request("/repository/process-definitions");
   }
 
+  async findInvestmentProcess(
+    investmentId: string,
+  ): Promise<{ id: string } | null> {
+    const result = await this.request<{
+      data?: Array<{
+        id: string;
+        businessKey: string;
+      }>;
+    }>(
+      `/runtime/process-instances?businessKey=${encodeURIComponent(investmentId)}&size=1`,
+    );
+
+    const process = result.data?.[0];
+
+    if (!process) {
+      return null;
+    }
+
+    return { id: process.id };
+  }
+
   async startInvestmentProcess(
     data: StartInvestmentProcessDto,
   ): Promise<{ id: string }> {
